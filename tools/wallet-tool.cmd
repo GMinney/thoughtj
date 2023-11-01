@@ -32,3 +32,4 @@ cd tools
 
 for /R "target/" %%F in (%TARGET_JAR%) do set JAR_NAME=%%~nxF
 java -jar "target/%JAR_NAME%" %1 %2 %3 %4 %5 %6 %7 %8
+pause

@@ -47,20 +47,20 @@ import org.bitcoinj.utils.VersionTally;
  */
 public abstract class NetworkParameters {
     /**
-     * The alert signing key originally owned by Satoshi, and now passed on to Gavin along with a few others.
+     * The alert signing key originally owned by Satoshi
      */
     @Deprecated
     public static final byte[] SATOSHI_KEY = Utils.HEX.decode("048240a8748a80a286b270ba126705ced4f2ce5a7847b3610ea3c06513150dade2a8512ed5ea86320824683fc0818f0ac019214973e677acd1244f6d0571fc5103");
 
     /** The string returned by getId() for the main, production network where people trade things. */
-    public static final String ID_MAINNET = "org.darkcoin.production";
+    public static final String ID_MAINNET = "live.thought.production"; // Changed for Thought
     /** The string returned by getId() for the testnet. */
 
-    public static final String ID_TESTNET = "org.darkcoin.test";
+    public static final String ID_TESTNET = "live.thought.test"; // Changed for Thought
     /** The string returned by getId() for the devnet. */
-    public static final String ID_DEVNET = "org.dash.dev";
+    public static final String ID_DEVNET = "live.thought.dev"; // Changed for Thought
     /** Unit test network. */
-    public static final String ID_UNITTESTNET = "com.google.darkcoin.unittest";
+    public static final String ID_UNITTESTNET = "live.thought.unittest"; // Changed for Thought
     /** The string returned by getId() for regtest mode. */
     public static final String ID_REGTEST = "org.bitcoin.regtest";
 
@@ -159,6 +159,19 @@ public abstract class NetworkParameters {
     protected String strSporkAddress;
     protected int minSporkKeys;
 
+
+    // Thought extra parameters
+    protected BigInteger maxCuckooTarget;
+    protected int cuckooHardForkBlockHeight;
+    protected int cuckooRequiredBlockHeight;
+    protected int midasStartHeight;
+    protected int midasValidHeight;
+
+    public static final int  CUCKOO_PROOF_SIZE = 42;
+    public static final int  CUCKOO_GRAPH_SIZE = 24;
+    public static final long CUCKOO_VERSION_MASK = 0x04;
+
+
     protected long fulfilledRequestExpireTime;
     protected long masternodeMinimumConfirmations;
 
@@ -196,10 +209,11 @@ public abstract class NetworkParameters {
 
     // A script the following message:
     //"LYWired 09/Jan/2014 The Grand Experiment Goes Live: Overstock.com Is Now Accepting Bitcoins"
-    private static final String genesisTxInputScriptBytes = "04ffff001d01044c5957697265642030392f4a616e2f3230313420546865204772616e64204578706572696d656e7420476f6573204c6976653a204f76657273746f636b2e636f6d204973204e6f7720416363657074696e6720426974636f696e73";
-    //
-    //
-    private static final String genesisTxScriptPubKeyBytes = "040184710fa689ad5023690c80f3a49c8f13f8d45b8c857fbcbc8bc4a8e4d3eb4b10f4d4604fa08dce601aaf0f470216fe1b51850b4acf21b179c45070ac7b03a9";
+    private static final String genesisTxInputScriptBytes = "04ffff001d01044c5b55534120546f6461792031342f4d61722f32303138204861776b696e6727732064656174682c2045696e737465696e27732062697274682c20616e64205069204461793a207768617420646f657320697420616c6c206d65616e3f";
+    // Changed for Thought
+
+    private static final String genesisTxScriptPubKeyBytes = "04ed28f11f74795344edfdbc1fccb1e6de37c909ab0c2a535aa6a054fca6fd34b05e3ed9822fa00df98698555d7582777afbc355ece13b7a47004ffe58c0b66c08";
+    // Changed for Thought
 
     private static Block createGenesis(NetworkParameters n) {
         Block genesisBlock = new Block(n, Block.BLOCK_VERSION_GENESIS);
@@ -212,7 +226,7 @@ public abstract class NetworkParameters {
             Script.writeBytes(scriptPubKeyBytes, Utils.HEX.decode(genesisTxScriptPubKeyBytes));
 
             scriptPubKeyBytes.write(ScriptOpCodes.OP_CHECKSIG);
-            t.addOutput(new TransactionOutput(n, t, Coin.valueOf(50, 0), scriptPubKeyBytes.toByteArray()));
+            t.addOutput(new TransactionOutput(n, t, Coin.valueOf(1618, 0), scriptPubKeyBytes.toByteArray()));
         } catch (Exception e) {
             // Cannot happen.
             throw new RuntimeException(e);
@@ -257,8 +271,8 @@ public abstract class NetworkParameters {
         return devNetGenesis;
     }
 
-    public static final int TARGET_TIMESPAN = (24 * 60 * 60); // 24 hours difficulty adjustment before KGW and DGW
-    public static final int TARGET_SPACING = (int)(2.5 * 60); // 2.5 minutes per block
+    public static final int TARGET_TIMESPAN = (int)(1.618 * 24 * 60 * 60); // 24 hours difficulty adjustment before KGW and DGW
+    public static final int TARGET_SPACING = (int)(1.618 * 60); // 2.5 minutes per block
     public static final int INTERVAL = TARGET_TIMESPAN / TARGET_SPACING; // 576 blocks before diff adjustment pre KGW
     
     /**
@@ -271,7 +285,7 @@ public abstract class NetworkParameters {
     /**
      * The maximum number of coins to be generated
      */
-    public static final long MAX_COINS = 22000000;
+    public static final long MAX_COINS = 1618000000;
 
     /**
      * The maximum money to be generated
@@ -344,6 +358,12 @@ public abstract class NetworkParameters {
      * @throws VerificationException if the block's difficulty is not correct.
      */
     public abstract void checkDifficultyTransitions(StoredBlock storedPrev, Block next, final BlockStore blockStore) throws VerificationException, BlockStoreException;
+
+    /**
+     * Throws an exception if the block's difficulty is not correct.
+     *
+     * @throws VerificationException if the block's difficulty is not correct.
+     */
 
     /**
      * Returns true if the block height is either not a checkpoint, or is a checkpoint and the hash matches.
@@ -493,6 +513,9 @@ public abstract class NetworkParameters {
      * The key used to sign {@link AlertMessage}s. You can use {@link ECKey#verify(byte[], byte[], byte[])} to verify
      * signatures using it.
      */
+    public BigInteger getMaxCuckooTarget() {
+        return maxCuckooTarget;
+    }
     @Deprecated
     public byte[] getAlertSigningKey() {
         return alertSigningKey;
@@ -661,12 +684,12 @@ public abstract class NetworkParameters {
     public abstract int getProtocolVersionNum(final ProtocolVersion version);
 
     public static enum ProtocolVersion {
-        MINIMUM(70228),
+        MINIMUM(70016),
         PONG(60001),
         BLOOM_FILTER(MINIMUM.getBitcoinProtocolVersion()),
         BLOOM_FILTER_BIP111(MINIMUM.getBitcoinProtocolVersion()+1),
         @Deprecated
-        DMN_LIST(70214),
+        DMN_LIST(70020),
         CORE17(70219),
         ISDLOCK(70220),
         BLS_LEGACY(70220),  // used internally by DashJ only
@@ -678,7 +701,7 @@ public abstract class NetworkParameters {
         COINJOIN_PROTX_HASH(70226),
         DMN_TYPE(70227),
         SMNLE_VERSIONED(70228),
-        CURRENT(70228);
+        CURRENT(70017);
 
         private final int bitcoinProtocol;
 
@@ -763,6 +786,10 @@ public abstract class NetworkParameters {
     public boolean isDeterministicMasternodesEnabled() {
         return deterministicMasternodesEnabled;
     }
+
+    public int getCuckooHardForkBlockHeight() {
+        return cuckooHardForkBlockHeight;
+    } // Added for Thought
 
     //LLMQ parameters
     protected HashMap<LLMQParameters.LLMQType, LLMQParameters> llmqs = new HashMap<>();
@@ -873,9 +900,9 @@ public abstract class NetworkParameters {
     public String getNetworkName() {
         switch (id) {
             case NetworkParameters.ID_MAINNET:
-                return "mainnet";
+                return "Mainnet";
             case NetworkParameters.ID_TESTNET:
-                return "testnet";
+                return "Testnet3";
             case NetworkParameters.ID_REGTEST:
                 return "regtest";
             case NetworkParameters.ID_UNITTESTNET:

@@ -8,7 +8,6 @@ import org.bitcoinj.crypto.BLSScheme;
 import org.bitcoinj.evolution.SimplifiedMasternodeListManager;
 import org.bitcoinj.evolution.SimplifiedMasternodesTest;
 import org.bitcoinj.params.MainNetParams;
-import org.bitcoinj.params.WhiteRussianDevNetParams;
 import org.bitcoinj.store.BlockStoreException;
 import org.bitcoinj.store.FlatDB;
 import org.bitcoinj.store.SPVBlockStore;
@@ -36,7 +35,6 @@ public class QuorumRotationStateTest {
     @BeforeClass
     public static void startup() throws BlockStoreException {
         MAINPARAMS = MainNetParams.get();
-        PARAMS = WhiteRussianDevNetParams.get();
         initContext(PARAMS, "devnet-333.spvchain");
         BLSScheme.setLegacyDefault(true);
     }

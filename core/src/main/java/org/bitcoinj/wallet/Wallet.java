@@ -2791,7 +2791,6 @@ public class Wallet extends BaseTaggableObject
                 return false;
             log.info("commitTx of {}", tx.getTxId());
 
-            log.info("commitTx of {}", tx.getHashAsString());
             Coin balance = getBalance();
             tx.setUpdateTime(Utils.now());
             // Put any outputs that are sending money back to us into the unspents map, and calculate their total value.

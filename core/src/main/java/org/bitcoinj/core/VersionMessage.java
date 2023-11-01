@@ -44,12 +44,12 @@ import java.util.Locale;
 public class VersionMessage extends Message {
 
     /** The version of this library release, as a string. */
-    public static final String BITCOINJ_VERSION = "19.0.6";
+    public static final String BITCOINJ_VERSION = "0.17.1-snapshot";
     /** The value that is prepended to the subVer field of this application. */
     public static final String LIBRARY_SUBVER = "/DashJ:" + BITCOINJ_VERSION + "/";
 
     /** A service bit that denotes whether the peer has a full copy of the block chain or not. */
-    public static final int NODE_NETWORK = 1 << 0;
+    public static final int NODE_NETWORK = 1;
     /** A service bit that denotes whether the peer supports the getutxos message or not. */
     public static final int NODE_GETUTXOS = 1 << 1;
     /** A service bit that denotes whether the peer supports BIP37 bloom filters or not. The service bit is defined in BIP111. */

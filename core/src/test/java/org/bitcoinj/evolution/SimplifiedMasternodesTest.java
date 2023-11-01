@@ -26,7 +26,6 @@ import static org.bitcoinj.evolution.SimplifiedMasternodeListEntry.LEGACY_BLS_VE
 import static org.junit.Assert.*;
 
 import org.bitcoinj.params.TestNet3Params;
-import org.bitcoinj.params.WhiteRussianDevNetParams;
 import org.bitcoinj.quorums.SimplifiedQuorumList;
 import org.bitcoinj.store.BlockStoreException;
 import org.bitcoinj.store.FlatDB;
@@ -57,7 +56,6 @@ public class SimplifiedMasternodesTest {
     public static void startup() throws BlockStoreException {
         MAINPARAMS = MainNetParams.get();
         PARAMS = TestNet3Params.get();
-        DEVNETPARAMS = WhiteRussianDevNetParams.get();
         initContext(PARAMS);
     }
 

@@ -23,7 +23,6 @@ import org.bitcoinj.params.AbstractBitcoinNetParams;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.params.RegTestParams;
 import org.bitcoinj.params.TestNet3Params;
-import org.bitcoinj.params.WhiteRussianDevNetParams;
 import org.bitcoinj.protocols.payments.PaymentProtocol;
 import org.bitcoinj.protocols.payments.PaymentProtocolException;
 import org.bitcoinj.protocols.payments.PaymentSession;
@@ -314,10 +313,6 @@ public class WalletTool {
             case REGTEST:
                 params = RegTestParams.get();
                 chainFileName = new File("regtest.chain");
-                break;
-            case DEVNET:
-                params = WhiteRussianDevNetParams.get();
-                chainFileName = new File("krupnik.chain");
                 break;
             default:
                 throw new RuntimeException("Unreachable.");
@@ -734,13 +729,7 @@ public class WalletTool {
             List<Peer> peerList = peerGroup.getConnectedPeers();
             if (peerList.size() == 1)
                 peerList.get(0).ping().get();
-        } catch (BlockStoreException e) {
-            throw new RuntimeException(e);
-        } catch (KeyCrypterException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (BlockStoreException | KeyCrypterException | InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         } catch (InsufficientMoneyException e) {
             System.err.println("Insufficient funds: have " + wallet.getBalance().toFriendlyString());

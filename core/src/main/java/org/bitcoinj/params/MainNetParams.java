@@ -42,21 +42,22 @@ public class MainNetParams extends AbstractBitcoinNetParams {
         interval = INTERVAL;
         targetTimespan = TARGET_TIMESPAN;
 
-        // 00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-        maxTarget = Utils.decodeCompactBits(0x1e0fffffL);
-        dumpedPrivateKeyHeader = 204;
-        addressHeader = 76;
-        p2shHeader = 16;
-        port = 9999;
-        packetMagic = 0xbf0c6bbdL;
+
+        maxTarget = Utils.decodeCompactBits(0x1e0fffffL); // Changed for Thought
+        dumpedPrivateKeyHeader = 123; // Changed for Thought
+        addressHeader = 7; // Changed for Thought
+        p2shHeader = 9; // Changed for Thought
+        port = 10618; // Changed for Thought
+        packetMagic = 0x59472ee4; //ajh - this is thought's
+
         bip32HeaderP2PKHpub = 0x0488b21e; // The 4 byte header that serializes in base58 to "xpub".
         bip32HeaderP2PKHpriv = 0x0488ade4; // The 4 byte header that serializes in base58 to "xprv"
         dip14HeaderP2PKHpub = 0x0eecefc5; // The 4 byte header that serializes in base58 to "dpmp".
         dip14HeaderP2PKHpriv = 0x0eecf02e; // The 4 byte header that serializes in base58 to "dpms"
 
-        genesisBlock.setDifficultyTarget(0x1e0ffff0L);
-        genesisBlock.setTime(1390095618L);
-        genesisBlock.setNonce(28917698);
+        genesisBlock.setDifficultyTarget(0x1d00ffffL); // Changed for Thought
+        genesisBlock.setTime(1521039602L); // Changed for Thought
+        genesisBlock.setNonce(2074325340); // Changed for Thought
 
         majorityEnforceBlockUpgrade = MAINNET_MAJORITY_ENFORCE_BLOCK_UPGRADE;
         majorityRejectBlockOutdated = MAINNET_MAJORITY_REJECT_BLOCK_OUTDATED;
@@ -66,44 +67,31 @@ public class MainNetParams extends AbstractBitcoinNetParams {
         subsidyDecreaseBlockCount = 210240;
         spendableCoinbaseDepth = 100;
         String genesisHash = genesisBlock.getHashAsString();
-        checkState(genesisHash.equals("00000ffd590b1485b3caadc19b22e6379c733355108f107a430458cdf3407ab6"),
-                genesisHash);
+        checkState(genesisHash.equals("00000000917e049641189c33d6b1275155e89b7b498b3b4f16d488f60afe513b"),
+                genesisHash); // Changed for Thought
 
         dnsSeeds = new String[] {
-                "dnsseed.dash.org"
-        };
+                "phee.thought.live",
+                "phi.thought.live",
+                "pho.thought.live",
+                "phum.thought.live"
+        }; // Changed for Thought
 
         // This contains (at a minimum) the blocks which are not BIP30 compliant. BIP30 changed how duplicate
         // transactions are handled. Duplicated transactions could occur in the case where a coinbase had the same
         // extraNonce and the same outputs but appeared at different heights, and greatly complicated re-org handling.
         // Having these here simplifies block connection logic considerably.
-        checkpoints.put(  1500, Sha256Hash.wrap("000000aaf0300f59f49bc3e970bad15c11f961fe2347accffff19d96ec9778e3"));
-        checkpoints.put(  4991, Sha256Hash.wrap("000000003b01809551952460744d5dbb8fcbd6cbae3c220267bf7fa43f837367"));
-        checkpoints.put(  9918, Sha256Hash.wrap("00000000213e229f332c0ffbe34defdaa9e74de87f2d8d1f01af8d121c3c170b"));
-        checkpoints.put( 16912, Sha256Hash.wrap("00000000075c0d10371d55a60634da70f197548dbbfa4123e12abfcbc5738af9"));
-        checkpoints.put( 23912, Sha256Hash.wrap("0000000000335eac6703f3b1732ec8b2f89c3ba3a7889e5767b090556bb9a276"));
-        checkpoints.put( 35457, Sha256Hash.wrap("0000000000b0ae211be59b048df14820475ad0dd53b9ff83b010f71a77342d9f"));
-        checkpoints.put( 45479, Sha256Hash.wrap("000000000063d411655d590590e16960f15ceea4257122ac430c6fbe39fbf02d"));
-        checkpoints.put( 55895, Sha256Hash.wrap("0000000000ae4c53a43639a4ca027282f69da9c67ba951768a20415b6439a2d7"));
-        checkpoints.put( 68899, Sha256Hash.wrap("0000000000194ab4d3d9eeb1f2f792f21bb39ff767cb547fe977640f969d77b7"));
-        checkpoints.put( 74619, Sha256Hash.wrap("000000000011d28f38f05d01650a502cc3f4d0e793fbc26e2a2ca71f07dc3842"));
-        checkpoints.put( 75095, Sha256Hash.wrap("0000000000193d12f6ad352a9996ee58ef8bdc4946818a5fec5ce99c11b87f0d"));
-        checkpoints.put( 88805, Sha256Hash.wrap("00000000001392f1652e9bf45cd8bc79dc60fe935277cd11538565b4a94fa85f"));
-        checkpoints.put(107996, Sha256Hash.wrap("00000000000a23840ac16115407488267aa3da2b9bc843e301185b7d17e4dc40"));
-        checkpoints.put(137993, Sha256Hash.wrap("00000000000cf69ce152b1bffdeddc59188d7a80879210d6e5c9503011929c3c"));
-        checkpoints.put(167996, Sha256Hash.wrap("000000000009486020a80f7f2cc065342b0c2fb59af5e090cd813dba68ab0fed"));
-        checkpoints.put(207992, Sha256Hash.wrap("00000000000d85c22be098f74576ef00b7aa00c05777e966aff68a270f1e01a5"));
-        checkpoints.put(312645, Sha256Hash.wrap("0000000000059dcb71ad35a9e40526c44e7aae6c99169a9e7017b7d84b1c2daf"));
-        checkpoints.put(407452, Sha256Hash.wrap("000000000003c6a87e73623b9d70af7cd908ae22fee466063e4ffc20be1d2dbc"));
-        checkpoints.put(523412, Sha256Hash.wrap("000000000000e54f036576a10597e0e42cc22a5159ce572f999c33975e121d4d"));
-        checkpoints.put(523930, Sha256Hash.wrap("0000000000000bccdb11c2b1cfb0ecab452abf267d89b7f46eaf2d54ce6e652c"));
-        checkpoints.put(750000, Sha256Hash.wrap("00000000000000b4181bbbdddbae464ce11fede5d0292fb63fdede1e7c8ab21c"));
-        checkpoints.put(888900, Sha256Hash.wrap("0000000000000026c29d576073ab51ebd1d3c938de02e9a44c7ee9e16f82db28"));
-        checkpoints.put(967800, Sha256Hash.wrap("0000000000000024e26c7df7e46d673724d223cf4ca2b2adc21297cc095600f4"));
-        checkpoints.put(1067570, Sha256Hash.wrap("000000000000001e09926bcf5fa4513d23e870a34f74e38200db99eb3f5b7a70"));
-        checkpoints.put(1167570, Sha256Hash.wrap("000000000000000fb7b1e9b81700283dff0f7d87cf458e5edfdae00c669de661"));
-        checkpoints.put(1364585, Sha256Hash.wrap("00000000000000022f355c52417fca9b73306958f7c0832b3a7bce006ca369ef"));
-        checkpoints.put(1450000, Sha256Hash.wrap("00000000000000105cfae44a995332d8ec256850ea33a1f7b700474e3dad82bc"));
+
+        checkpoints.put(  0, Sha256Hash.wrap("00000000917e049641189c33d6b1275155e89b7b498b3b4f16d488f60afe513b"));
+        checkpoints.put(  2, Sha256Hash.wrap("00000000c4c1989f0979bae2b24840b48ddb5197866a8ee99c9399a2512ec588"));
+        checkpoints.put(  5, Sha256Hash.wrap("000000003a062431a6e4430a6ade4ab402a29165462491338c98b336a8afb6ab"));
+        checkpoints.put( 256, Sha256Hash.wrap("00000000acf5b9f9eb1ea8c56f07ff00c2e3b5335c1b574f98cc3b8b55b70ec3"));
+        checkpoints.put( 1024, Sha256Hash.wrap("000000006aef3c0953d44120c972061811aca7a59167076573f9063e46265419"));
+        checkpoints.put( 43010, Sha256Hash.wrap("00000000328f2e44914cf6af972de811d0f4869f9b4e9217e4093dd297c79f49"));
+        checkpoints.put( 229731, Sha256Hash.wrap("000000006645878b6aa7c4f10044b9914e994f11e1c3905c72b7f7612c417a94"));
+        checkpoints.put( 248000, Sha256Hash.wrap("006b52a5d017eb2590d25750c46542b2de43f7a3fdc6394d95db458cbcb35f85"));
+        checkpoints.put( 388285, Sha256Hash.wrap("00e0d38562e2f576c3c501f4768b282824a7f9489778537c49e3b5492923f5c5"));
+
 
         // Dash does not have a Http Seeder
         // If an Http Seeder is set up, add it here.  References: HttpDiscovery
@@ -303,19 +291,19 @@ public class MainNetParams extends AbstractBitcoinNetParams {
                 0xf00f45d9
         };
 
-        strSporkAddress = "Xgtyuk76vhuFW2iT7UAiHgNdWXCf3J34wh";
+        strSporkAddress = "3vjBVUDb38RDsByGVFZ3AVkzB4eU1XJ9ox";
         minSporkKeys = 1;
-        budgetPaymentsStartBlock = 328008;
-        budgetPaymentsCycleBlocks = 16616;
+        budgetPaymentsStartBlock = 385627;
+        budgetPaymentsCycleBlocks = 26700;
         budgetPaymentsWindowBlocks = 100;
 
-        DIP0001BlockHeight = 782208;
+        DIP0001BlockHeight = 393500;
 
         fulfilledRequestExpireTime = 60*60;
         masternodeMinimumConfirmations = 15;
         superblockStartBlock = 614820;
         superblockCycle = 16616;
-        nGovernanceMinQuorum = 10;
+        nGovernanceMinQuorum = 40;
         nGovernanceFilterElements = 20000;
 
         powDGWHeight = 34140;
@@ -329,6 +317,12 @@ public class MainNetParams extends AbstractBitcoinNetParams {
         DIP0003BlockHeight = 1028160;
         deterministicMasternodesEnabledHeight = 1047200;
         deterministicMasternodesEnabled = true;
+
+        maxCuckooTarget = new BigInteger("00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
+        cuckooHardForkBlockHeight = 246500;
+        cuckooRequiredBlockHeight = 248800;
+        midasStartHeight = 337;
+        midasValidHeight = 512;
 
         DIP0008BlockHeight = 1088640;
         DIP0024BlockHeight = 1737792 + 4 * 288; // DIP24 activation time + 4 cycles

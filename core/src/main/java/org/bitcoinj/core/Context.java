@@ -16,7 +16,6 @@
 
 package org.bitcoinj.core;
 
-import org.bitcoinj.crypto.BLSScheme;
 import org.bitcoinj.evolution.MasternodeMetaDataManager;
 import org.bitcoinj.utils.ContextPropagatingThreadFactory;
 import javax.annotation.Nullable;
@@ -29,8 +28,9 @@ import org.bitcoinj.quorums.*;
 import org.bitcoinj.store.FlatDB;
 import org.bitcoinj.store.HashStore;
 import org.bitcoinj.wallet.SendRequest;
-import org.dashj.bls.BLSJniLibrary;
 import org.slf4j.*;
+import org.bitcoinj.crypto.BLSScheme;
+import org.dashj.bls.BLSJniLibrary;
 
 import java.io.File;
 import java.util.EnumSet;
@@ -122,7 +122,7 @@ public class Context {
      * @param ensureMinRequiredFee Whether to ensure the minimum required fee by default when completing transactions. For details, see {@link SendRequest#ensureMinRequiredFee}.
      */
     public Context(NetworkParameters params, int eventHorizon, Coin feePerKb, boolean ensureMinRequiredFee) {
-        log.info("Creating dashj {} context using dashj-bls {}.", VersionMessage.BITCOINJ_VERSION, BLSJniLibrary.VERSION);
+        log.info("Creating thoughtj {} context using thoughtj-bls {}.", VersionMessage.BITCOINJ_VERSION, BLSJniLibrary.VERSION);
         this.confidenceTable = new TxConfidenceTable();
         this.voteConfidenceTable = new VoteConfidenceTable();
         this.params = params;

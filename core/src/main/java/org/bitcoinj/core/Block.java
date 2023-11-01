@@ -20,7 +20,8 @@ package org.bitcoinj.core;
 import com.google.common.annotations.*;
 import com.google.common.base.*;
 import com.google.common.collect.*;
-import com.hashengineering.crypto.X11;
+import org.bitcoinj.crypto.cuckoo.algo.Cuckoo;
+import org.bitcoinj.crypto.cuckoo.Miner;
 import org.bitcoinj.script.*;
 import org.slf4j.*;
 
@@ -68,7 +69,7 @@ public class Block extends Message {
      * avoid somebody creating a titanically huge but valid block and forcing everyone to download/store it forever.
      */
     public static final int MAX_BLOCK_SIZE = 1 * 1000 * 1000;
-    public static final int MAX_BLOCK_SIZE_DIP0001 = 2 * 1000 * 1000;
+    public static final int MAX_BLOCK_SIZE_DIP0001 = 4 * 1000 * 1000;
     /**
      * A "sigop" is a signature verification operation. Because they're expensive we also impose a separate limit on
      * the number in a block to prevent somebody mining a huge block that has way more sigops than normal, so is very
@@ -100,6 +101,7 @@ public class Block extends Message {
     private long time;
     private long difficultyTarget; // "nBits"
     private long nonce;
+    private int[] cuckooSolution; // Added for Thought
 
     // TODO: Get rid of all the direct accesses to this field. It's a long-since unnecessary holdover from the Dalvik days.
     /** If null, it means this object holds only the headers. */
@@ -121,11 +123,15 @@ public class Block extends Message {
         super(params);
         // Set up a few basic things. We are not complete after this though.
         version = setVersion;
-        difficultyTarget = 0x1e0fffffL;
+        difficultyTarget = 0x1d00ffffL;
         time = Utils.currentTimeMillis() / 1000;
         prevBlockHash = Sha256Hash.ZERO_HASH;
-
-        length = HEADER_SIZE;
+        int cuckooLength = 0;
+        if (isCuckooBlock())
+        {
+            cuckooLength = NetworkParameters.CUCKOO_PROOF_SIZE * 4;
+        }
+        length = HEADER_SIZE + cuckooLength;
     }
 
     /**
@@ -209,6 +215,37 @@ public class Block extends Message {
         this.transactions.addAll(transactions);
     }
 
+    /**
+     * Construct a block initialized with all the given fields.
+     * @param params Which network the block is for.
+     * @param version This should usually be set to 1 or 2, depending on if the height is in the coinbase input.
+     * @param prevBlockHash Reference to previous block in the chain or {@link Sha256Hash#ZERO_HASH} if genesis.
+     * @param merkleRoot The root of the merkle tree formed by the transactions.
+     * @param time UNIX time when the block was mined.
+     * @param difficultyTarget Number which this block hashes lower than.
+     * @param nonce Arbitrary number to make the block hash lower than the target.
+     * @param transactions List of transactions including the coinbase.
+     * @param cuckooSolution Array of nonces that make up the cuckoo cycle solution.
+     */
+    public Block(NetworkParameters params, long version, Sha256Hash prevBlockHash, Sha256Hash merkleRoot, long time,
+                 long difficultyTarget, long nonce, List<Transaction> transactions, int[] cuckooSolution) {
+        super(params);
+        this.version = version;
+        this.prevBlockHash = prevBlockHash;
+        this.merkleRoot = merkleRoot;
+        this.time = time;
+        this.difficultyTarget = difficultyTarget;
+        this.nonce = nonce;
+        this.transactions = new LinkedList<>();
+        this.transactions.addAll(transactions);
+        this.cuckooSolution = cuckooSolution;
+    }
+    public boolean isCuckooBlock()
+    {
+        // Hack for now
+        return (version >= 1610612736L);
+    }
+
 
     /**
      * <p>A utility method that calculates how much new Bitcoin would be created by the block at the given height.
@@ -224,7 +261,37 @@ public class Block extends Message {
         return getBlockInflation(params, height, nPrevBits, fSuperblockPartOnly);
     }
 
+    /* Thought GetBlockSubsidy using getBlockInflation */
+
     public static Coin getBlockInflation(NetworkParameters params, int height, long nPrevBits, boolean fSuperblockPartOnly) {
+
+        int nPrevHeight = height - 1;
+
+        int halvings = (nPrevHeight + 1) / params.subsidyDecreaseBlockCount;
+        // Force block reward to zero when right shift is undefined.
+        if (halvings >= 64)
+            return Coin.ZERO;
+
+        Coin nSubsidy = Coin.COIN.multiply(314);
+        // Special case for the first block allows premine.
+        if ((nPrevHeight + 1) == 1)
+        {
+            nSubsidy = Coin.COIN.multiply(809016994);
+        }
+        else
+        {
+            long adj = nSubsidy.getValue();
+            adj >>= halvings;
+            nSubsidy = Coin.COIN.multiply(adj);
+        }
+
+        return nSubsidy;
+
+    }
+
+    /*
+    public static Coin getBlockInflation(NetworkParameters params, int height, long nPrevBits, boolean fSuperblockPartOnly) {
+
         double dDiff;
         long nSubsidyBase;
         int nPrevHeight = height - 1;
@@ -232,7 +299,7 @@ public class Block extends Message {
 
 
         if (nPrevHeight <= 4500 && params.getId().equals(NetworkParameters.ID_MAINNET)) {
-        /* a bug which caused diff to not be correctly calculated */
+        // a bug which caused diff to not be correctly calculated //
             dDiff = (double)0x0000ffff / (double)(nPrevBits & 0x00ffffff);
         } else {
             dDiff = Utils.convertBitsToDouble(nPrevBits);
@@ -271,6 +338,7 @@ public class Block extends Message {
 
         return fSuperblockPartOnly ? nSuperblockPart : nSubsidy.minus(nSuperblockPart);
     }
+    */
 
     /**
      * Parse transactions from the block.
@@ -305,11 +373,11 @@ public class Block extends Message {
     private static final long START_MASTERNODE_PAYMENTS_1 = 1401033600L; //Sun, 25 May 2014 16:00:00 GMT
     private static final long START_MASTERNODE_PAYMENTS_STOP_1 = 1401134533L; // Mon, 26 May 2014 20:02:13 GMT
 
-    private static final long START_MASTERNODE_PAYMENTS = 1403728576L; //Fri, 20 Jun 2014 16:00:00 GMT
+    private static final long START_MASTERNODE_PAYMENTS = 1559121024L; // May 29, 2019 9:10:24 AM, block 385627
     //private static final long START_MASTERNODE_PAYMENTS_STOP = ?
 
-    private static final long START_MASTERNODE_PAYMENTS_TESTNET_1 = 1401757793;
-    private static final long START_MASTERNODE_PAYMENTS_TESTNET = 1403568776L;
+    private static final long START_MASTERNODE_PAYMENTS_TESTNET_1 = 1559121024L; // block 153668, using same time as mainnet
+    //private static final long START_MASTERNODE_PAYMENTS_TESTNET = 1403568776L;
 
     @Override
     protected void parse() throws ProtocolException {
@@ -321,8 +389,22 @@ public class Block extends Message {
         time = readUint32();
         difficultyTarget = readUint32();
         nonce = readUint32();
-        hash = Sha256Hash.wrapReversed(X11.x11Digest(payload, offset, cursor - offset));
+
+        // Cuckoo, if needed
+        if (isCuckooBlock())
+        {
+            System.out.println("Parsing Cuckoo Solution");
+            cuckooSolution = new int[NetworkParameters.CUCKOO_PROOF_SIZE];
+            for (int i = 0; i < NetworkParameters.CUCKOO_PROOF_SIZE; i++)
+            {
+                cuckooSolution[i] = (int) readUint32();
+            }
+        }
+        hash = calculateHash();
         headerBytesValid = serializer.isParseRetainMode();
+
+        //hash = Sha256Hash.wrapReversed(X11.x11Digest(payload, offset, cursor - offset));
+        //headerBytesValid = serializer.isParseRetainMode();
 
         // transactions
         parseTransactions(offset + HEADER_SIZE);
@@ -350,6 +432,14 @@ public class Block extends Message {
         Utils.uint32ToByteStreamLE(time, stream);
         Utils.uint32ToByteStreamLE(difficultyTarget, stream);
         Utils.uint32ToByteStreamLE(nonce, stream);
+    }
+
+    private void writeCuckooSolution(OutputStream stream) throws IOException
+    {
+        for (int i : cuckooSolution)
+        {
+            Utils.uint32ToByteStreamLE(i, stream);
+        }
     }
 
     private void writeTransactions(OutputStream stream) throws IOException {
@@ -397,6 +487,10 @@ public class Block extends Message {
         ByteArrayOutputStream stream = new UnsafeByteArrayOutputStream(length == UNKNOWN_LENGTH ? HEADER_SIZE + guessTransactionsLength() : length);
         try {
             writeHeader(stream);
+            if (isCuckooBlock())
+            {
+                writeCuckooSolution(stream);
+            }
             writeTransactions(stream);
         } catch (IOException e) {
             // Cannot happen, we are serializing to a memory stream.
@@ -404,10 +498,33 @@ public class Block extends Message {
         return stream.toByteArray();
     }
 
+    public byte[] getCuckooBytes()
+    {
+        byte[] retval = null;
+        if (isCuckooBlock())
+        {
+            ByteArrayOutputStream stream = new UnsafeByteArrayOutputStream(NetworkParameters.CUCKOO_PROOF_SIZE * 4);
+            try
+            {
+                writeCuckooSolution(stream);
+            }
+            catch (IOException e)
+            {
+                // Cannot happen, we are serializing to a memory stream.
+            }
+            retval = stream.toByteArray();
+        }
+        return retval;
+    }
+
     @Override
     protected void bitcoinSerializeToStream(OutputStream stream) throws IOException {
         writeHeader(stream);
         // We may only have enough data to write the header.
+        if (isCuckooBlock())
+        {
+            writeCuckooSolution(stream);
+        }
         writeTransactions(stream);
     }
 
@@ -464,9 +581,25 @@ public class Block extends Message {
      */
     private Sha256Hash calculateHash() {
         try {
-            ByteArrayOutputStream bos = new UnsafeByteArrayOutputStream(HEADER_SIZE);
-            writeHeader(bos);
-            return Sha256Hash.wrapReversed(X11.x11Digest(bos.toByteArray()));
+            Sha256Hash retval;
+            if (isCuckooBlock())
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int n = 0; n < cuckooSolution.length; n++)
+                {
+                    sb.append(String.format("%08X", Integer.reverseBytes(cuckooSolution[n])));
+                }
+                byte[] b = Utils.hexStringToByteArray(sb.toString());
+                retval = Sha256Hash.wrapReversed(Sha256Hash.hashTwice(b));
+
+            }
+            else
+            {
+                ByteArrayOutputStream bos = new UnsafeByteArrayOutputStream(HEADER_SIZE);
+                writeHeader(bos);
+                retval = Sha256Hash.wrapReversed(Sha256Hash.hashTwice(bos.toByteArray()));
+            }
+            return retval;
         } catch (IOException e) {
             throw new RuntimeException(e); // Cannot happen.
         }
@@ -530,6 +663,7 @@ public class Block extends Message {
         block.difficultyTarget = difficultyTarget;
         block.transactions = null;
         block.hash = getHash();
+        block.cuckooSolution = cuckooSolution;
     }
 
     /**
@@ -552,6 +686,17 @@ public class Block extends Message {
         s.append("   time: ").append(time).append(" (").append(Utils.dateTimeFormat(time * 1000)).append(")\n");
         s.append("   difficulty target (nBits): ").append(difficultyTarget).append("\n");
         s.append("   nonce: ").append(nonce).append("\n");
+        if (isCuckooBlock())
+        {
+            s.append("   cuckoo solution: [");
+            for (int i = 0; i < cuckooSolution.length; i++)
+            {
+                s.append(cuckooSolution[i]);
+                if (i + 1 < cuckooSolution.length)
+                    s.append(", ");
+            }
+            s.append("]\n");
+        }
         if (transactions != null && transactions.size() > 0) {
             s.append("   with ").append(transactions.size()).append(" transaction(s):\n");
             for (Transaction tx : transactions) {
@@ -571,11 +716,13 @@ public class Block extends Message {
     public void solve() {
         while (true) {
             try {
-                // Is our proof of work valid yet?
-                if (checkProofOfWork(false))
-                    return;
-                // No, so increment the nonce and try again.
-                setNonce(getNonce() + 1);
+                // TODO: Need to add cuckoo solver
+                if (this.isCuckooBlock()) {
+                    // Get a cuckoo solution
+                    //startCuckooMiner();
+                    //this.verifyHeader();
+
+                }
             } catch (VerificationException e) {
                 throw new RuntimeException(e); // Cannot happen.
             }
@@ -604,18 +751,55 @@ public class Block extends Message {
         //
         // To prevent this attack from being possible, elsewhere we check that the difficultyTarget
         // field is of the right value. This requires us to have the preceding blocks.
-        BigInteger target = getDifficultyTargetAsInteger();
-        BigInteger h = getHash().toBigInteger();
 
-        if (h.compareTo(target) > 0) {
+        boolean retval = false;
+        BigInteger target = getDifficultyTargetAsInteger();
+        BigInteger h = null;
+        if (this.isCuckooBlock())
+        {
+            ByteArrayOutputStream stream = new UnsafeByteArrayOutputStream(HEADER_SIZE);
+            try
+            {
+                writeHeader(stream);
+            }
+            catch (IOException e)
+            {
+                // Cannot happen, we are serializing to a memory stream.
+            }
+            Cuckoo c = new Cuckoo(stream.toByteArray(), NetworkParameters.CUCKOO_GRAPH_SIZE, NetworkParameters.CUCKOO_PROOF_SIZE);
+
+            if (c.verify(cuckooSolution, Cuckoo.nNodes))
+            {
+                h = calculateHash().toBigInteger();
+            }
+            else if (throwException)
+            {
+                throw new VerificationException("Cuckoo cycle not verified");
+            }
+            else
+            {
+                h = null;
+                retval = false;
+            }
+
+        }
+        else
+        {
+            h = getHash().toBigInteger();
+        }
+        if (null != h && h.compareTo(target) > 0)
+        {
             // Proof of work check failed!
             if (throwException)
-                throw new VerificationException("Hash is higher than target: " + getHashAsString() + " vs "
-                        + target.toString(16));
+                throw new VerificationException("Hash is higher than target: " + h.toString(16) + " vs " + target.toString(16));
             else
-                return false;
+                retval = false;
         }
-        return true;
+        else
+        {
+            retval = true;
+        }
+        return retval;
     }
 
     private void checkTimestamp() throws VerificationException {
@@ -916,6 +1100,19 @@ public class Block extends Message {
         unCacheHeader();
         this.nonce = nonce;
         this.hash = null;
+    }
+
+    /** Gets the array of cuckoo nonces. */
+    public void setCuckooSolution(int[] solution)
+    {
+        unCacheHeader();
+        this.cuckooSolution = solution;
+        this.hash = null;
+    }
+
+    public int[] getCuckooSolution()
+    {
+        return this.cuckooSolution;
     }
 
     /** Returns an immutable list of transactions held in this block, or null if this object represents just a header. */

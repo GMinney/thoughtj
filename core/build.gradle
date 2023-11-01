@@ -6,22 +6,23 @@ apply plugin: 'jacoco'
 apply plugin: 'signing'
 
 version = '19.0.6'
-archivesBaseName = 'dashj-core'
-eclipse.project.name = 'dashj-core'
+archivesBaseName = 'thoughtj-core'
+eclipse.project.name = 'thoughtj-core'
 
 dependencies {
-    compile 'org.bouncycastle:bcprov-jdk15to18:1.68'
-    implementation 'com.google.guava:guava:28.2-android'
-    compile 'com.google.protobuf:protobuf-javalite:3.14.0'
+    implementation 'org.bouncycastle:bcprov-jdk15to18:1.69'
+    implementation 'com.google.guava:guava:30.0-android'
+    implementation 'com.google.protobuf:protobuf-javalite:3.16.3'
     implementation 'com.squareup.okhttp3:okhttp:3.12.8'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'net.jcip:jcip-annotations:1.0'
     compileOnly 'org.fusesource.leveldbjni:leveldbjni-all:1.8'
     testImplementation 'junit:junit:4.13.1'
     testImplementation 'org.easymock:easymock:3.2'
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.9.10.7'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
     testImplementation 'org.slf4j:slf4j-jdk14:1.7.30'
-    testImplementation 'com.h2database:h2:1.3.167'
+    // https://mvnrepository.com/artifact/com.h2database/h2
+    testImplementation group: 'com.h2database', name: 'h2', version: '2.2.224'
     testImplementation 'org.fusesource.leveldbjni:leveldbjni-all:1.8'
     testImplementation 'org.hamcrest:hamcrest-library:1.3'
 
@@ -29,7 +30,7 @@ dependencies {
     implementation 'de.sfuhrm:saphir-hash-core:3.0.10'
     implementation 'org.dashj:dashj-bls:1.0.0'
     implementation 'com.lambdaworks:scrypt:1.4.0'
-    implementation 'org.json:json:20210307'
+    implementation 'org.json:json:20230227'
 
 }
 
@@ -40,7 +41,7 @@ javadoc.options.encoding = 'UTF-8'
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.14.0'
+        artifact = 'com.google.protobuf:protoc:3.16.3'
     }
     generateProtoTasks {
         all().each { task ->
@@ -51,7 +52,6 @@ protobuf {
             }
         }
     }
-    generatedFilesBaseDir = new File(projectDir, '/src') // workaround for '$projectDir/src'
 }
 
 test {
@@ -71,12 +71,12 @@ tasks.withType(Test) {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
@@ -88,14 +88,14 @@ artifacts {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId = 'dashj-core'
+            artifactId = 'thoughtj-core'
             from components.java
             artifact sourcesJar
             artifact javadocJar
             pom {
-                name = 'DashJ'
-                description = 'Dash Java Library'
-                url = 'httsp://dashj.org'
+                name = 'ThoughtJ'
+                description = 'Thought Java Library'
+                url = 'httsp://thoughtai.org'
 
                 licenses {
                     license {
@@ -111,9 +111,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/dashevo/dashj.git'
-                    developerConnection = 'scm:git:ssh://github.com/dashevo/dashj.git'
-                    url = 'http://github.com/dashevo/dashj.git'
+                    connection = 'scm:git:git://github.com/GMinney/thoughtj.git'
+                    developerConnection = 'scm:git:ssh://github.com/GMinney/thoughtj.git'
+                    url = 'https://github.com/GMinney/thoughtj.git'
                 }
             }
         }
@@ -149,7 +149,7 @@ assemble.dependsOn(sourcesJar)
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
     reports {
-        xml.enabled true
-        xml.destination file("${project.projectDir}/build/reports/jacoco/jacoco.xml")
+        xml.required = true
+        xml.outputLocation = file("${project.projectDir}/build/reports/jacoco/jacoco.xml")
     }
 }

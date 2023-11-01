@@ -55,13 +55,13 @@ public final class MonetaryFormat {
     /** Standard format for fiat amounts. */
     public static final MonetaryFormat FIAT = new MonetaryFormat().shift(0).minDecimals(2).repeatOptionalDecimals(2, 1);
     /** Currency code for base 1 Bitcoin. */
-    public static final String CODE_BTC = "DASH";
+    public static final String CODE_BTC = "THT";
     /** Currency code for base 1/1000 Bitcoin. */
-    public static final String CODE_MBTC = "mDASH";
+    public static final String CODE_MBTC = "mTHT";
     /** Currency code for base 1/1000000 Bitcoin. */
-    public static final String CODE_UBTC = "µDASH";
+    public static final String CODE_UBTC = "µTHT";
     /** Currency symbol for base 1 Bitcoin. */
-    public static final String SYMBOL_BTC = "\u00d0";
+    public static final String SYMBOL_BTC = "T";
     /** Currency symbol for base 1/1000 Bitcoin. */
     public static final String SYMBOL_MBTC = "m" + SYMBOL_BTC;
     /** Currency symbol for base 1/1000000 Bitcoin. */

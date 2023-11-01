@@ -158,12 +158,12 @@ public class BLSDeterministicKey extends BLSKey implements IDeterministicKey {
      * This method exists to avoid code repetition in the constructors.
      */
     private int ascertainParentFingerprint(BLSDeterministicKey parentKey, int parentFingerprint)
-    throws IllegalArgumentException {
+            throws IllegalArgumentException {
         if (parentFingerprint != 0) {
             if (parent != null)
                 checkArgument(parent.getFingerprint() == parentFingerprint,
-                              "parent fingerprint mismatch",
-                              Integer.toHexString(parent.getFingerprint()), Integer.toHexString(parentFingerprint));
+                        "parent fingerprint mismatch",
+                        Integer.toHexString(parent.getFingerprint()), Integer.toHexString(parentFingerprint));
             return parentFingerprint;
         } else return 0;
     }
@@ -736,10 +736,10 @@ public class BLSDeterministicKey extends BLSKey implements IDeterministicKey {
     }
 
     /**
-      * Deserialize a base-58-encoded HD Key.
-      *  @param parent The parent node in the given key's deterministic hierarchy.
-      *  @throws IllegalArgumentException if the base58 encoded key could not be parsed.
-      */
+     * Deserialize a base-58-encoded HD Key.
+     *  @param parent The parent node in the given key's deterministic hierarchy.
+     *  @throws IllegalArgumentException if the base58 encoded key could not be parsed.
+     */
     public static BLSDeterministicKey deserializeB58(@Nullable BLSDeterministicKey parent, String base58, NetworkParameters params) {
         return deserialize(params, Base58.decodeChecked(base58), parent);
     }
@@ -753,14 +753,14 @@ public class BLSDeterministicKey extends BLSKey implements IDeterministicKey {
     }
 
     /**
-      * Deserialize an HD Key with no parent
-      */
+     * Deserialize an HD Key with no parent
+     */
     public static BLSDeterministicKey deserialize(NetworkParameters params, byte[] serializedKey) {
         return deserialize(params, serializedKey, (BLSDeterministicKey)null);
     }
 
     /**
-      * Deserialize an HD Key.
+     * Deserialize an HD Key.
      * @param parent The parent node in the given key's deterministic hierarchy.
      */
     public static BLSDeterministicKey deserialize(NetworkParameters params, byte[] serializedKey, @Nullable BLSDeterministicKey parent) {
@@ -893,7 +893,7 @@ public class BLSDeterministicKey extends BLSKey implements IDeterministicKey {
 
     @Override
     public void formatKeyWithAddress(boolean includePrivateKeys, @Nullable KeyParameter aesKey, StringBuilder builder,
-            NetworkParameters params, Script.ScriptType outputScriptType, @Nullable String comment) {
+                                     NetworkParameters params, Script.ScriptType outputScriptType, @Nullable String comment) {
         builder.append("  addr:").append(Address.fromPubKeyHash(params, getPubKeyHash()));
         builder.append("  hash160:").append(Utils.HEX.encode(getPubKeyHash()));
         builder.append("  (").append(getPathAsString());

@@ -6,8 +6,8 @@ syntax = "proto2";
 
 package org.bitcoin.crawler;
 
-option java_package = "org.bitcoin.crawler";
-option java_outer_classname = "PeerSeedProtos";
+option java_package = "org.bitcoin.crawler"; // Specifies in what package the generated classes should live
+option java_outer_classname = "PeerSeedProtos"; // Classname given to the generated class. PeerSeedProtos.java
 
 message PeerSeedData {
     required string ip_address = 1;

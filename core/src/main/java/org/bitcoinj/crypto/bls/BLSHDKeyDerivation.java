@@ -68,7 +68,7 @@ public final class BLSHDKeyDerivation {
      * @throws HDDerivationException if privKeyBytes is invalid (not between 0 and n inclusive).
      */
     public static BLSDeterministicKey createMasterPrivKeyFromBytes(byte[] privKeyBytes, byte[] chainCode,
-            ImmutableList<ChildNumber> childNumberPath) throws HDDerivationException {
+                                                                   ImmutableList<ChildNumber> childNumberPath) throws HDDerivationException {
         return new BLSDeterministicKey(childNumberPath, chainCode, privKeyBytes, null);
     }
 

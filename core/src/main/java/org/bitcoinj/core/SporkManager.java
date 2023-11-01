@@ -50,8 +50,8 @@ public class SporkManager {
         mapSporkDefaults.put(sporkId, new SporkDefinition(sporkId, defaultValue));
     }
     static {
-        makeSporkDefinition(SporkId.SPORK_2_INSTANTSEND_ENABLED, 4070908800L); // OFF
-        makeSporkDefinition(SporkId.SPORK_3_INSTANTSEND_BLOCK_FILTERING, 4070908800L); // OFF
+        makeSporkDefinition(SporkId.SPORK_2_INSTANTSEND_ENABLED, 0L); // OFF
+        makeSporkDefinition(SporkId.SPORK_3_INSTANTSEND_BLOCK_FILTERING, 0L); // OFF
         makeSporkDefinition(SporkId.SPORK_9_SUPERBLOCKS_ENABLED, 4070908800L); // OFF
         makeSporkDefinition(SporkId.SPORK_17_QUORUM_DKG_ENABLED, 4070908800L); // OFF
         makeSporkDefinition(SporkId.SPORK_19_CHAINLOCKS_ENABLED, 4070908800L); // OFF

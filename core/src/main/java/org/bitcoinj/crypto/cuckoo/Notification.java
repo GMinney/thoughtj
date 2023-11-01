@@ -1,0 +1,17 @@
+package org.bitcoinj.crypto.cuckoo;
+
+public enum Notification
+{
+    SYSTEM_ERROR,
+    PERMISSION_ERROR,
+    CONNECTION_ERROR,
+    AUTHENTICATION_ERROR,
+    COMMUNICATION_ERROR,
+    LONG_POLLING_FAILED,
+    LONG_POLLING_ENABLED,
+    NEW_BLOCK_DETECTED,
+    NEW_WORK,
+    POW_TRUE,
+    POW_FALSE,
+    TERMINATED
+}
