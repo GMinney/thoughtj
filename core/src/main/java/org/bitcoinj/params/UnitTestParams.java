@@ -38,16 +38,16 @@ public class UnitTestParams extends AbstractBitcoinNetParams {
         packetMagic = 0x2b9939bf;
         addressHeader = 109;
         p2shHeader = 193;
-        maxTarget = new BigInteger("00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16);
+        maxTarget = Utils.decodeCompactBits(0x1e0fffffL);
         genesisBlock.setTime(Utils.currentTimeSeconds());
         genesisBlock.setDifficultyTarget(Block.EASIEST_DIFFICULTY_TARGET);
-        genesisBlock.solve();
+        //genesisBlock.solve();
         port = 11618;
-        interval = 10;
+        interval = INTERVAL;
         dumpedPrivateKeyHeader = 239;
-        targetTimespan = 200000000;  // 6 years. Just a very big number.
-        spendableCoinbaseDepth = 5;
-        subsidyDecreaseBlockCount = 100;
+        targetTimespan = TARGET_TIMESPAN;
+        spendableCoinbaseDepth = 100;
+        subsidyDecreaseBlockCount = 1299382; // Changed for Thought
         dnsSeeds = null;
         addrSeeds = null;
         bip32HeaderP2PKHpub = 0x043587CF; // The 4 byte header that serializes in base58 to "tpub".
@@ -58,7 +58,7 @@ public class UnitTestParams extends AbstractBitcoinNetParams {
         majorityWindow = 7;
 
         DIP0001BlockHeight = 100000;  // not active
-        strSporkAddress = "yjPtiKh2uwk3bDutTEA2q9mCtXyiZRWn55";
+        strSporkAddress = "kxkf3ojUeHpzBuU5qdXEWKND5E4LmkQ6qU";
         budgetPaymentsStartBlock = 4100;
         budgetPaymentsCycleBlocks = 50;
         budgetPaymentsWindowBlocks = 10;

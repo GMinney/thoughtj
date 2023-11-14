@@ -42,14 +42,14 @@ public class AddressTest {
 
     @Test
     public void testJavaSerialization() throws Exception {
-        Address testAddress = Address.fromBase58(TESTNET, "ydzm4Uvr2GkLxTwQnwiyijYUukk1eweBo4");
+        Address testAddress = Address.fromBase58(TESTNET, "kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq");
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         new ObjectOutputStream(os).writeObject(testAddress);
         Address testAddressCopy = (Address) new ObjectInputStream(new ByteArrayInputStream(os.toByteArray()))
                 .readObject();
         assertEquals(testAddress, testAddressCopy);
 
-        Address mainAddress = Address.fromBase58(MAINNET, "Xtqn4ks8sJS7iG7S7r1Jf37eFFSJGwh8a8");
+        Address mainAddress = Address.fromBase58(MAINNET, "42jEVihde9MqeqgtdKCBYe215UgUrJ545v");
         os = new ByteArrayOutputStream();
         new ObjectOutputStream(os).writeObject(mainAddress);
         Address mainAddressCopy = (Address) new ObjectInputStream(new ByteArrayInputStream(os.toByteArray()))
@@ -60,22 +60,24 @@ public class AddressTest {
     @Test
     public void stringification() throws Exception {
         // Test a testnet address.
-        Address a = Address.fromPubKeyHash(TESTNET, HEX.decode("fda79a24e50ff70ff42f7d89585da5bd19d9e5cc"));
-        assertEquals("yjSeawEuRUJDpr9FMmGx1oFtPrEjQG3vkg", a.toString());
+        Address a = Address.fromPubKeyHash(TESTNET, HEX.decode("0a63b5ce1e7fe6ce871528d8ac682d5297f2fe48"));
+        assertEquals("ksngXjrUNbd5Xj9CWPEDXtQP4bM2fKtbHL", a.toString());
         assertEquals(Script.ScriptType.P2PKH, a.getOutputScriptType());
 
-        Address b = Address.fromPubKeyHash(MAINNET, HEX.decode("4a22c3c4cbb31e4d03b15550636762bda0baf85a"));
-        assertEquals("XhSqUwiG6PGjRCXD5sksyvRNE1ZV8jkaVC", b.toString());
+        Address b = Address.fromPubKeyHash(MAINNET, HEX.decode("688d5862951d300f68fe64c794e94a5d7cbe9a81"));
+        assertEquals("3yu3VYxGVmGZFeStA5dmKodi7vP5J4AWeb", b.toString());
         assertEquals(Script.ScriptType.P2PKH, b.getOutputScriptType());
     }
 
     @Test
     public void decoding() throws Exception {
-        Address a = Address.fromBase58(TESTNET, "yjSeawEuRUJDpr9FMmGx1oFtPrEjQG3vkg");
-        assertEquals("fda79a24e50ff70ff42f7d89585da5bd19d9e5cc", Utils.HEX.encode(a.getHash()));
+        Address a = Address.fromBase58(TESTNET, "kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq");
+        // Looking for the raw hash not in Wallet Import Format (WIF) - kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq convert to hex, strip the first 1st byte of network, strip last 4 bytes - checksum =
+        // kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq -> 6d2989e3f5c9fb3ecbb08f573f6cba59ea4cb383e56b2f2252 -> 2989e3f5c9fb3ecbb08f573f6cba59ea4cb383e5
+        assertEquals("2989e3f5c9fb3ecbb08f573f6cba59ea4cb383e5", Utils.HEX.encode(a.getHash()));
 
-        Address b = Address.fromBase58(MAINNET, "XhSqUwiG6PGjRCXD5sksyvRNE1ZV8jkaVC");
-        assertEquals("4a22c3c4cbb31e4d03b15550636762bda0baf85a", Utils.HEX.encode(b.getHash()));
+        Address b = Address.fromBase58(MAINNET, "3yu3VYxGVmGZFeStA5dmKodi7vP5J4AWeb");
+        assertEquals("688d5862951d300f68fe64c794e94a5d7cbe9a81", Utils.HEX.encode(b.getHash()));
     }
 
     @Test
@@ -102,7 +104,7 @@ public class AddressTest {
 
         // Check the case of a mismatched network.
         try {
-            Address.fromBase58(TESTNET, "Xtqn4ks8sJS7iG7S7r1Jf37eFFSJGwh8a8");
+            Address.fromBase58(TESTNET, "3yu3VYxGVmGZFeStA5dmKodi7vP5J4AWeb");
             fail();
         } catch (AddressFormatException.WrongNetwork e) {
             // Success.
@@ -113,9 +115,9 @@ public class AddressTest {
 
     @Test
     public void getNetwork() throws Exception {
-        NetworkParameters params = Address.getParametersFromAddress("XgxQxd6B8iYgEEryemnJrpvoWZ3149MCkK");
+        NetworkParameters params = Address.getParametersFromAddress("3yu3VYxGVmGZFeStA5dmKodi7vP5J4AWeb");
         assertEquals(MAINNET.getId(), params.getId());
-        params = Address.getParametersFromAddress("ydzm4Uvr2GkLxTwQnwiyijYUukk1eweBo4");
+        params = Address.getParametersFromAddress("kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq");
         assertEquals(TESTNET.getId(), params.getId());
     }
 
@@ -150,29 +152,29 @@ public class AddressTest {
     @Test
     public void p2shAddress() throws Exception {
         // Test that we can construct P2SH addresses
-        Address mainNetP2SHAddress = Address.fromBase58(MAINNET, "7WJnm5FSpJttSr72bWWqFFZrXwB8ZzsK7b"); //2ac4b0b501117cc8119c5797b519538d4942e90e
+        Address mainNetP2SHAddress = Address.fromBase58(MAINNET, "4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf"); //2ac4b0b501117cc8119c5797b519538d4942e90e
         assertEquals(mainNetP2SHAddress.getVersion(), MAINNET.p2shHeader);
         assertEquals(Script.ScriptType.P2SH, mainNetP2SHAddress.getOutputScriptType());
 
-        Address testNetP2SHAddress = Address.fromBase58(TESTNET, "8gfggfujFTJDtRMtrkWBKHX4Uz6uufXNC2"); //18a0e827269b5211eb51a4af1b2fa69333efa722
+        Address testNetP2SHAddress = Address.fromBase58(TESTNET, "kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq"); //18a0e827269b5211eb51a4af1b2fa69333efa722
         assertEquals(testNetP2SHAddress.getVersion(), TESTNET.p2shHeader);
         assertEquals(Script.ScriptType.P2SH, testNetP2SHAddress.getOutputScriptType());
 
         // Test that we can determine what network a P2SH address belongs to
-        NetworkParameters mainNetParams = Address.getParametersFromAddress("7WJnm5FSpJttSr72bWWqFFZrXwB8ZzsK7b");
+        NetworkParameters mainNetParams = Address.getParametersFromAddress("4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf");
         assertEquals(MAINNET.getId(), mainNetParams.getId());
-        NetworkParameters testNetParams = Address.getParametersFromAddress("8gfggfujFTJDtRMtrkWBKHX4Uz6uufXNC2");
+        NetworkParameters testNetParams = Address.getParametersFromAddress("kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq");
         assertEquals(TESTNET.getId(), testNetParams.getId());
 
         // Test that we can convert them from hashes
         byte[] hex = HEX.decode("2ac4b0b501117cc8119c5797b519538d4942e90e");
         Address a = Address.fromScriptHash(MAINNET, hex);
-        assertEquals("7WJnm5FSpJttSr72bWWqFFZrXwB8ZzsK7b", a.toString());
+        assertEquals("4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf", a.toString());
         Address b = Address.fromScriptHash(TESTNET, HEX.decode("18a0e827269b5211eb51a4af1b2fa69333efa722"));
-        assertEquals("8gfggfujFTJDtRMtrkWBKHX4Uz6uufXNC2", b.toString());
+        assertEquals("kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq", b.toString());
         Address c = Address.fromScriptHash(MAINNET,
                 ScriptPattern.extractHashFromP2SH(ScriptBuilder.createP2SHOutputScript(hex)));
-        assertEquals("7WJnm5FSpJttSr72bWWqFFZrXwB8ZzsK7b", c.toString());
+        assertEquals("4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf", c.toString());
     }
 
     @Test
@@ -194,7 +196,7 @@ public class AddressTest {
 
     @Test
     public void cloning() throws Exception {
-        Address a = Address.fromPubKeyHash(TESTNET, HEX.decode("fda79a24e50ff70ff42f7d89585da5bd19d9e5cc"));
+        Address a = Address.fromPubKeyHash(TESTNET, HEX.decode("0a63b5ce1e7fe6ce871528d8ac682d5297f2fe48"));
         Address b = a.clone();
 
         assertEquals(a, b);
@@ -203,13 +205,13 @@ public class AddressTest {
 
     @Test
     public void roundtripBase58() throws Exception {
-        String base58 = "Xtqn4ks8sJS7iG7S7r1Jf37eFFSJGwh8a8";
+        String base58 = "4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf";
         assertEquals(base58, Address.fromBase58(null, base58).toBase58());
     }
 
     @Test
     public void comparisonCloneEqualTo() throws Exception {
-        Address a = Address.fromBase58(MAINNET, "XoVhYqRxPWkCw8WjZfiHPYsoR7g4Ny3x7K");
+        Address a = Address.fromBase58(MAINNET, "4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf");
         Address b = a.clone();
 
         int result = a.compareTo(b);
@@ -218,8 +220,8 @@ public class AddressTest {
 
     @Test
     public void comparisonLessThan() throws Exception {
-        Address a = Address.fromBase58(MAINNET, "XoVhYqRxPWkCw8WjZfiHPYsoR7g4Ny3x7K");
-        Address b = Address.fromBase58(MAINNET, "XpDe4AXdEf9NtW5ZBeGmuzy2VShg3qZMFQ");
+        Address a = Address.fromBase58(MAINNET, "42jEVihde9MqeqgtdKCBYe215UgUrJ545v");
+        Address b = Address.fromBase58(MAINNET, "4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf");
 
         int result = a.compareTo(b);
         assertTrue(result < 0);
@@ -227,8 +229,8 @@ public class AddressTest {
 
     @Test
     public void comparisonGreaterThan() throws Exception {
-        Address a = Address.fromBase58(MAINNET, "XpDe4AXdEf9NtW5ZBeGmuzy2VShg3qZMFQ");
-        Address b = Address.fromBase58(MAINNET, "XoVhYqRxPWkCw8WjZfiHPYsoR7g4Ny3x7K");
+        Address a = Address.fromBase58(MAINNET, "4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf");
+        Address b = Address.fromBase58(MAINNET, "42jEVihde9MqeqgtdKCBYe215UgUrJ545v");
 
         int result = a.compareTo(b);
         assertTrue(result > 0);
@@ -237,8 +239,8 @@ public class AddressTest {
     @Test
     public void comparisonBytesVsString() throws Exception {
         // TODO: To properly test this we need a much larger data set
-        Address a = Address.fromBase58(MAINNET, "XoVhYqRxPWkCw8WjZfiHPYsoR7g4Ny3x7K");
-        Address b = Address.fromBase58(MAINNET, "XpDe4AXdEf9NtW5ZBeGmuzy2VShg3qZMFQ");
+        Address a = Address.fromBase58(MAINNET, "42jEVihde9MqeqgtdKCBYe215UgUrJ545v");
+        Address b = Address.fromBase58(MAINNET, "4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf");
 
         int resultBytes = a.compareTo(b);
         int resultsString = a.toString().compareTo(b.toString());

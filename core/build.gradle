@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'com.google.protobuf'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
 apply plugin: 'signing'
@@ -54,6 +55,14 @@ protobuf {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+    }
+}
+
 test {
     exclude 'org/bitcoinj/core/PeerTest*'
     exclude 'org/bitcoinj/core/TransactionBroadcastTest*'
@@ -66,16 +75,18 @@ test {
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     systemProperty "java.library.path", "../contrib/dashj-bls/bls/target/cmake:../contrib/x11/build"
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
     archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
+tasks.register('sourcesJar', Jar) {
+    dependsOn classes
     archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
@@ -85,57 +96,6 @@ artifacts {
     archives javadocJar
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = 'thoughtj-core'
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-            pom {
-                name = 'ThoughtJ'
-                description = 'Thought Java Library'
-                url = 'httsp://thoughtai.org'
-
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'hashengineering'
-                        name = 'HashEngineering'
-                        email = 'hashengineeringsolutions@gmail.com'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/GMinney/thoughtj.git'
-                    developerConnection = 'scm:git:ssh://github.com/GMinney/thoughtj.git'
-                    url = 'https://github.com/GMinney/thoughtj.git'
-                }
-            }
-        }
-    }
-    repositories {
-        maven {
-            // change URLs to point to your repos, e.g. http://my.org/repo
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
-                username = project.hasProperty('ossrhUsername')?project.findProperty('ossrhUsername'):''
-                password = project.hasProperty('ossrhPassword')?project.findProperty('ossrhPassword'):''
-            }
-        }
-    }
-}
-
-signing {
-    required { gradle.taskGraph.hasTask("publish") }
-    sign publishing.publications.mavenJava
-}
 
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {

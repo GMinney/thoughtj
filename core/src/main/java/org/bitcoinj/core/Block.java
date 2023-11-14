@@ -714,7 +714,7 @@ public class Block extends Message {
      * extraNonce.</p>
      */
     public void solve() {
-        while (true) {
+        //while (true) {
             try {
                 // TODO: Need to add cuckoo solver
                 if (this.isCuckooBlock()) {
@@ -726,7 +726,7 @@ public class Block extends Message {
             } catch (VerificationException e) {
                 throw new RuntimeException(e); // Cannot happen.
             }
-        }
+        //}
     }
 
     /**
@@ -737,7 +737,7 @@ public class Block extends Message {
     public BigInteger getDifficultyTargetAsInteger() throws VerificationException {
         BigInteger target = Utils.decodeCompactBits(difficultyTarget);
         if (target.signum() <= 0 || target.compareTo(params.maxTarget) > 0)
-            throw new VerificationException("Difficulty target is bad: " + target.toString());
+            throw new VerificationException("Difficulty target is bad: " + target.toString() + " - Signum: " + target.signum() + " - params.maxTarget: " + params.maxTarget);
         return target;
     }
 
