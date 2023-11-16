@@ -479,7 +479,9 @@ public class ScriptBuilder {
 
     /**
      * Creates a P2SH output script for n-of-m multisig with given public keys and threshold. Given public keys will
-     * be placed in redeem script in the lexicographical sorting order.
+     * be placed in redeem script in the lexicographical sorting order. (Changed for thought)
+     *
+     * Note - I removed the lexicographical sorting since thought chain doesn't appear to sort the keys when creating the redeem script. Annoying ass bug.
      *
      * @param threshold The threshold number of keys that must sign (n)
      * @param pubkeys A list of m public keys
@@ -500,7 +502,7 @@ public class ScriptBuilder {
      */
     public static Script createRedeemScript(int threshold, List<ECKey> pubkeys) {
         pubkeys = new ArrayList<>(pubkeys);
-        Collections.sort(pubkeys, ECKey.PUBKEY_COMPARATOR);
+        //Collections.sort(pubkeys, ECKey.PUBKEY_COMPARATOR);
         return ScriptBuilder.createMultiSigOutputScript(threshold, pubkeys);
     }
 

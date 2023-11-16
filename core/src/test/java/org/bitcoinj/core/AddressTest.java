@@ -180,18 +180,18 @@ public class AddressTest {
     @Test
     public void p2shAddressCreationFromKeys() throws Exception {
         // import some keys from this example: https://gist.github.com/gavinandresen/3966071
-        ECKey key1 = DumpedPrivateKey.fromBase58(MAINNET, "7rZrMXc6R9TeuMa5UCX8i9Ffn1r3d8ypp6dJkmg1JEPZNhQodL8").getKey();
+        ECKey key1 = DumpedPrivateKey.fromBase58(MAINNET, "KJU4eLyXPgvKX1kY5HpEPma9RLgjNYRcHxFo1Sa3i6gnANMYzqU8").getKey();
         key1 = ECKey.fromPrivate(key1.getPrivKeyBytes());
-        ECKey key2 = DumpedPrivateKey.fromBase58(MAINNET, "7rPEeydXbxsD1VHSuU7V8Jhn2RPPBgQUxZ1vnVK6QMKxigcC9HX").getKey();
+        ECKey key2 = DumpedPrivateKey.fromBase58(MAINNET, "KGC1RCjiCHfCHdA34RTSwbYNKQEYGz3C3EdR1nXofozvTiLHr1mP").getKey();
         key2 = ECKey.fromPrivate(key2.getPrivKeyBytes());
-        ECKey key3 = DumpedPrivateKey.fromBase58(MAINNET, "7sM7Tn3tMHUyE6iYVrxAzRf94XnPceRHrdKQNQwFPVfwp3uwr1k").getKey();
+        ECKey key3 = DumpedPrivateKey.fromBase58(MAINNET, "KFm5pPhVuXDdCWXVuj7SG3g4XwY4iDePvjSRKUBXkJGTWJR2DkF7").getKey();
         key3 = ECKey.fromPrivate(key3.getPrivKeyBytes());
 
         List<ECKey> keys = Arrays.asList(key1, key2, key3);
-        Script p2shScript = ScriptBuilder.createP2SHOutputScript(2, keys);
+        Script p2shScript = ScriptBuilder.createP2SHOutputScript(3, keys);
         Address address = Address.fromScriptHash(MAINNET,
                 ScriptPattern.extractHashFromP2SH(p2shScript));
-        assertEquals("7pUXwZyXEMWv87j2vnY6SiWDB1bi2rHEb4", address.toString());
+        assertEquals("4gM6h3xYpATZMr7tAHUCftW4uVctfcbksu", address.toString());
     }
 
     @Test
