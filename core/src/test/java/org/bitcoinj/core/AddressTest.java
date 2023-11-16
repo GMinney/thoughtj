@@ -139,7 +139,7 @@ public class AddressTest {
         NetworkParameters params = Address.getParametersFromAddress("LLxSnHLN2CYyzB5eWTR9K9rS9uWtbTQFb6");
         assertEquals(altNetwork.getId(), params.getId());
         // Check if main network works as before
-        params = Address.getParametersFromAddress("Xtqn4ks8sJS7iG7S7r1Jf37eFFSJGwh8a8");
+        params = Address.getParametersFromAddress("4gM6h3xYpATZMr7tAHUCftW4uVctfcbksu");
         assertEquals(MAINNET.getId(), params.getId());
         // Unregister network
         Networks.unregister(altNetwork);
@@ -152,29 +152,30 @@ public class AddressTest {
     @Test
     public void p2shAddress() throws Exception {
         // Test that we can construct P2SH addresses
-        Address mainNetP2SHAddress = Address.fromBase58(MAINNET, "4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf"); //2ac4b0b501117cc8119c5797b519538d4942e90e
+        Address mainNetP2SHAddress = Address.fromBase58(MAINNET, "4gM6h3xYpATZMr7tAHUCftW4uVctfcbksu"); //2ac4b0b501117cc8119c5797b519538d4942e90e
         assertEquals(mainNetP2SHAddress.getVersion(), MAINNET.p2shHeader);
         assertEquals(Script.ScriptType.P2SH, mainNetP2SHAddress.getOutputScriptType());
 
-        Address testNetP2SHAddress = Address.fromBase58(TESTNET, "kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq"); //18a0e827269b5211eb51a4af1b2fa69333efa722
+        Address testNetP2SHAddress = Address.fromBase58(TESTNET, "2LgWkNsKGue1y8Q6PSx1QJRUXrCUkDmfu9U"); //18a0e827269b5211eb51a4af1b2fa69333efa722
         assertEquals(testNetP2SHAddress.getVersion(), TESTNET.p2shHeader);
         assertEquals(Script.ScriptType.P2SH, testNetP2SHAddress.getOutputScriptType());
 
         // Test that we can determine what network a P2SH address belongs to
-        NetworkParameters mainNetParams = Address.getParametersFromAddress("4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf");
+        NetworkParameters mainNetParams = Address.getParametersFromAddress("4gM6h3xYpATZMr7tAHUCftW4uVctfcbksu");
         assertEquals(MAINNET.getId(), mainNetParams.getId());
-        NetworkParameters testNetParams = Address.getParametersFromAddress("kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq");
+        NetworkParameters testNetParams = Address.getParametersFromAddress("2LgWkNsKGue1y8Q6PSx1QJRUXrCUkDmfu9U");
         assertEquals(TESTNET.getId(), testNetParams.getId());
 
         // Test that we can convert them from hashes
-        byte[] hex = HEX.decode("2ac4b0b501117cc8119c5797b519538d4942e90e");
-        Address a = Address.fromScriptHash(MAINNET, hex);
-        assertEquals("4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf", a.toString());
-        Address b = Address.fromScriptHash(TESTNET, HEX.decode("18a0e827269b5211eb51a4af1b2fa69333efa722"));
-        assertEquals("kvdPDVw6T6ws8N2fAZiaFMHsJLXWDXtHiq", b.toString());
+        byte[] hex_mainnet = HEX.decode("243fdc84aa6eef1642acdf8019629ba44e173c70");
+        byte[] hex_testnet = HEX.decode("0e0eed99c84475ba69f4eb06f60c7e15ce0a8459");
+        Address a = Address.fromScriptHash(MAINNET, hex_mainnet);
+        assertEquals("4gM6h3xYpATZMr7tAHUCftW4uVctfcbksu", a.toString());
+        Address b = Address.fromScriptHash(TESTNET, hex_testnet);
+        assertEquals("2LgWkNsKGue1y8Q6PSx1QJRUXrCUkDmfu9U", b.toString());
         Address c = Address.fromScriptHash(MAINNET,
-                ScriptPattern.extractHashFromP2SH(ScriptBuilder.createP2SHOutputScript(hex)));
-        assertEquals("4DKrc7BEEd8CbJRF3wREov8RqDBfGndiaf", c.toString());
+                ScriptPattern.extractHashFromP2SH(ScriptBuilder.createP2SHOutputScript(hex_mainnet)));
+        assertEquals("4gM6h3xYpATZMr7tAHUCftW4uVctfcbksu", c.toString());
     }
 
     @Test
