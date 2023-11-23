@@ -54,7 +54,7 @@ protobuf {
         }
     }
 }
-
+/*
 sourceSets {
     main {
         java {
@@ -62,7 +62,7 @@ sourceSets {
         }
     }
 }
-
+*/
 test {
     exclude 'org/bitcoinj/core/PeerTest*'
     exclude 'org/bitcoinj/core/TransactionBroadcastTest*'
