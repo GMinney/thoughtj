@@ -35,28 +35,30 @@ public class BitcoinSerializerTest {
             "ed52399b01e215104d010000000000000000000000000000000000ffff0a000001208d");
 
     private static final byte[] TRANSACTION_MESSAGE_BYTES = HEX.withSeparator(" ", 2).decode(
-            "bf 0c 6b bd 74 78 00 00  00 00 00 00 00 00 00 00" +
-            "02 01 00 00 e2 93 cd be  01 00 00 00 01 6d bd db" +
-            "08 5b 1d 8a f7 51 84 f0  bc 01 fa d5 8d 12 66 e9" +
-            "b6 3b 50 88 19 90 e4 b4  0d 6a ee 36 29 00 00 00" +
-            "00 8b 48 30 45 02 21 00  f3 58 1e 19 72 ae 8a c7" +
-            "c7 36 7a 7a 25 3b c1 13  52 23 ad b9 a4 68 bb 3a" +
-            "59 23 3f 45 bc 57 83 80  02 20 59 af 01 ca 17 d0" +
-            "0e 41 83 7a 1d 58 e9 7a  a3 1b ae 58 4e de c2 8d" +
-            "35 bd 96 92 36 90 91 3b  ae 9a 01 41 04 9c 02 bf" +
-            "c9 7e f2 36 ce 6d 8f e5  d9 40 13 c7 21 e9 15 98" +
-            "2a cd 2b 12 b6 5d 9b 7d  59 e2 0a 84 20 05 f8 fc" +
-            "4e 02 53 2e 87 3d 37 b9  6f 09 d6 d4 51 1a da 8f" +
-            "14 04 2f 46 61 4a 4c 70  c0 f1 4b ef f5 ff ff ff" +
-            "ff 02 40 4b 4c 00 00 00  00 00 19 76 a9 14 1a a0" +
-            "cd 1c be a6 e7 45 8a 7a  ba d5 12 a9 d9 ea 1a fb" +
-            "22 5e 88 ac 80 fa e9 c7  00 00 00 00 19 76 a9 14" +
-            "0e ab 5b ea 43 6a 04 84  cf ab 12 48 5e fd a0 b7" +
-            "8b 4e cc 52 88 ac 00 00  00 00");
+            "59 47 2E E4 34 01 00 00  01 00 00 00 00 00 00 00" +
+            "00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00" +
+            "00 00 00 00 00 00 00 00  00 00 00 00 D6 C2 03 1A" +
+            "67 9C 5E 91 20 F7 35 62  9C C4 5A 8E AB 5F 58 79" +
+            "AA CE 2E E5 19 F3 50 A3  BF 98 3A 48 F2 38 A9 5A" +
+            "FF FF 00 1D 5C B1 A3 7B  01 01 00 00 00 01 00 00" +
+            "00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00" +
+            "00 00 00 00 00 00 00 00  00 00 00 00 00 00 FF FF" +
+            "FF FF 64 04 FF FF 00 1D  01 04 4C 5B 55 53 41 20" +
+            "54 6F 64 61 79 20 31 34  2F 4D 61 72 2F 32 30 31" +
+            "38 20 48 61 77 6B 69 6E  67 27 73 20 64 65 61 74" +
+            "68 2C 20 45 69 6E 73 74  65 69 6E 27 73 20 62 69" +
+            "72 74 68 2C 20 61 6E 64  20 50 69 20 44 61 79 3A" +
+            "20 77 68 61 74 20 64 6F  65 73 20 69 74 20 61 6C" +
+            "6C 20 6D 65 61 6E 3F FF  FF FF FF 01 00 12 08 AC" +
+            "25 00 00 00 43 41 04 ED  28 F1 1F 74 79 53 44 ED" +
+            "FD BC 1F CC B1 E6 DE 37  C9 09 AB 0C 2A 53 5A A6" +
+            "A0 54 FC A6 FD 34 B0 5E  3E D9 82 2F A0 0D F9 86" +
+            "98 55 5D 75 82 77 7A FB  C3 55 EC E1 3B 7A 47 00" +
+            "4F FE 58 C0 B6 6C 08 AC  00 00 00 00"); // changed for thought
     private static final byte[] TRANSACTION_MESSAGE_BYTES1 = HEX.decode(
-            "bf0c6bbd"+ //magic
-                    "747800000000000000000000" +//tx
-                    "e1000000"+ //size 225
+            "59472ee4"+ //magic thought testnet
+                    "747800000000000000000000" +//tx ?
+                    "34010000"+ //size 308
                     "" + //checksum
                     "0100000001926cdbfc59ae9276e09658759baf1792fa91636511fd639aaced4db2157c081d000000006a473044022063e34eb24f1af68166aa5fe3cbfd86e50cea0ecdd2c08a2a72d52f15ff97f0bc02200fc944e5bad0dda595c2a63f07c7ed3423bc54b2358af6b16c7373135f2678be012102bc42016328bfa02822955ff7490fc963318350779537875e82ce155338f9656fffffffff02c0047700000000001976a91420804bbc0868bda507f436e4aeec0c813ff26de188acc08c6c05000000001976a91465d5ed3c9ed684c3fe6e0bc48a164557a6892cd488ac00000000");
 

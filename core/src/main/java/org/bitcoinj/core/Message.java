@@ -343,7 +343,7 @@ public abstract class Message {
 
     protected byte[] readBytes(int length) throws ProtocolException {
         if ((length > MAX_SIZE) || (cursor + length > payload.length)) {
-            throw new ProtocolException("Claimed value length too large: " + length);
+            throw new ProtocolException("Claimed value length too large: " + length + " Cursor: " + cursor + " Payload_length: " + payload.length);
         }
         try {
             byte[] b = new byte[length];

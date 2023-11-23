@@ -35,11 +35,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.bitcoinj.core.Utils.HEX;
 import static org.junit.Assert.*;
@@ -55,7 +53,7 @@ public class BlockTest {
     @Before
     public void setUp() throws Exception {
         new Context(TESTNET);
-        blockBytes = HEX.decode("00000020157dc13d40818f91eddb8d14dd2e8dcb43f2c4dd2935d4065238788d00000000ec269fd49d1d0c5613f918a686f71ddb3a8f92c7b85b385f3dfed4f0c5cd0a392b92f9584ee1001d059cf2910301000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4c0327de02042b92f95808fabe6d6dec5faa57bc58a0f6aeb6555f0900000092db0a8600000000ac88bd54c554c6e701000000000000006ffffff3710100000d2f6e6f64655374726174756d2f00000000022c460e43000000001976a914cf5783cdb4347cf4d6b4026fbdd895e460acbc5088ac2c460e43000000001976a91440312e1aeebc7e2e99047125d78f19f51df6180188ac0000000001000000032ec44449143edfba5bc741a899b22c9ea1797750195000cfc9a8317aca5b858a000000006b483045022100f04f5686febb8d9df0af2f8fee92e74048dd79ec6e44acb7c05a16b635c9320502207aed80d5b137463a6c0e5b2af859ce3e5475945ad167072f1216dccbd16ffee00121038ecdf3413d4e7e2797cc1b038f9ba9e42b83f261e64d9115569e46d741b2da24feffffffd9bb73a65adeeab77186fe0d33917a0661a6d6da7e94a64486fae91135adf71e000000006a473044022055ba9a7106dc28e90c72c2d41f937528ea6aacb371f79ca3a18f9305236b2c2d0220558d833028626f16ad93acfcb990ca68575d1874befc85a185ef78a3c11ccd5e0121038ecdf3413d4e7e2797cc1b038f9ba9e42b83f261e64d9115569e46d741b2da24feffffffdca428fda53beb894c01c398b7a92f744b60ae5c0e01ea29f985edf6305d322e000000006a47304402205edcea624377076f2db313346cc5a7f364594912cfd6a695e7beb77834c0ffc2022004d67d23b7c8b825d17c3f5a37cb57cee4fd5ff121c080b674d4d41decb52717012103353cc80209a47dbf0f434385bb293b1f08b92e2dd3917c51483e5c846ad77f71feffffff02c70a8d05000000001976a914c88b91c4e0e738d082f29fd784ff11de29eb244b88acf5741c86000000001976a914dc3e0793134b081145ec0c67a9c72a7b297df27c88ac25de0200010000000229035c9d173a3581cd3e751e30803d8007178debee5c43ab0667f22d3d1d85b5000000006a47304402205208c78c617e2847bde13b7d09c36b14aa048a55972f9c8b49f657ea82d1f5d602202fac89274602079cecd7bbe7cfd577e64084d68734531a56c2db0374f93ce0bb01210342d0a0181a33451fe901dec2a01ef22fc5ad570c5de507cfbf70417777fa3374feffffffdd2b4139ad014967454591a796045b2f02259def4d3c5a26c2c32e4f3d786f68000000006a47304402205f49906b990f0a35c5349de8453ebc7c70f3a59259cc524e1508c97a2eba09f00220745e5c0eb38421b9b7ac4e9c181bc3bb0d96b9c6eab26af9ea7ba5852664391e0121038ecdf3413d4e7e2797cc1b038f9ba9e42b83f261e64d9115569e46d741b2da24feffffff024b4a0f00000000001976a914f32788579f94cab7974f8119e7383c3d14357c5388ac40230e43000000001976a914dc3e0793134b081145ec0c67a9c72a7b297df27c88ac26de0200");
+        blockBytes = HEX.decode("010000000000000000000000000000000000000000000000000000000000000000000000d6c2031a679c5e9120f735629cc45a8eab5f5879aace2ee519f350a3bf983a48f238a95affff001d5cb1a37b0101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff6404ffff001d01044c5b55534120546f6461792031342f4d61722f32303138204861776b696e6727732064656174682c2045696e737465696e27732062697274682c20616e64205069204461793a207768617420646f657320697420616c6c206d65616e3fffffffff01001208ac25000000434104ed28f11f74795344edfdbc1fccb1e6de37c909ab0c2a535aa6a054fca6fd34b05e3ed9822fa00df98698555d7582777afbc355ece13b7a47004ffe58c0b66c08ac00000000");
         block = TESTNET.getDefaultSerializer().makeBlock(blockBytes);
 
     }
@@ -63,24 +61,29 @@ public class BlockTest {
     @Test
     public void testWork() throws Exception {
         BigInteger work = TESTNET.getGenesisBlock().getWork();
-        // This number is printed by Dash Core at startup as the calculated value of chainWork on testnet:
-        // 2017-04-22 19:20:20 UpdateTip: new best=00000bafbc94add76cb75e2ec92894837288a481e5c005f6563d91623bf8bc2c  height=0  log2_work=20.000022  tx=1  date=2014-01-25 16:10:06 progress=0.000002
-        // log base 2 of 1048592 is 20.000022
-        assertEquals(BigInteger.valueOf(1048592), work);
+        // This number refers to the "chainwork" param in the block hexdump.
+        // In a hex-encoded json output, for example from the rpc command "getblock", the chainwork will look
+        // like this - "0000000000000000000000000000000000000000000000000000000100010001"
+        // "0000000000000000000000000000000000000000000000000000000100010001" is the hex notation (base16) for the decimal value (base10) "4295032833"
+        // append an "L" to make the number a Long
+
+        assertEquals(BigInteger.valueOf(4295032833L), work);
     }
 
     @Test
     public void testBlockVerification() throws Exception {
         Block block = TESTNET.getDefaultSerializer().makeBlock(blockBytes);
         block.verify(Block.BLOCK_HEIGHT_GENESIS, EnumSet.noneOf(Block.VerifyFlag.class));
-        assertEquals("000000000fba0622132b6acd887021db720c541590d0408bc3ae525277fb2636", block.getHashAsString());
+        assertEquals("00000000917e049641189c33d6b1275155e89b7b498b3b4f16d488f60afe513b", block.getHashAsString());
     }
-    
-    @SuppressWarnings("deprecation")
+
     @Test
     public void testDate() throws Exception {
         Block block = TESTNET.getDefaultSerializer().makeBlock(blockBytes);
-        assertEquals("21 Apr 2017 05:01:31 GMT", block.getTime().toGMTString());
+        TimeZone tz = TimeZone.getTimeZone("GMT");
+        DateFormat date = new SimpleDateFormat("dd MMM yyyy HH:mm:ss 'GMT'");
+        date.setTimeZone(tz);
+        assertEquals("14 Mar 2018 15:00:02 GMT", date.format(block.getTime()));
     }
 
     @Test
@@ -182,8 +185,8 @@ public class BlockTest {
         // contains a coinbase transaction whose height is two bytes, which is
         // shorter than we see in most other cases.
 
-        //Block block = TESTNET.getDefaultSerializer().makeBlock(
-        //    ByteStreams.toByteArray(getClass().getResourceAsStream("block_testnet21066.dat")));
+        Block block = TESTNET.getDefaultSerializer().makeBlock(
+        ByteStreams.toByteArray(getClass().getResourceAsStream("block_testnet21066.dat")));
 
         // Check block.
         assertEquals("000000000fba0622132b6acd887021db720c541590d0408bc3ae525277fb2636", block.getHashAsString());
@@ -214,7 +217,7 @@ public class BlockTest {
         final long BLOCK_NONCE = 1964091772L;
         final Coin BALANCE_AFTER_BLOCK = Coin.valueOf(945025609L);
         Block block49389 = TESTNET.getDefaultSerializer().makeBlock(
-                ByteStreams.toByteArray(Objects.requireNonNull(getClass().getResourceAsStream("block_testnet49389.dat")))
+                ByteStreams.toByteArray(Objects.requireNonNull(getClass().getResourceAsStream("thoughttestnet3.dat")))
         );
 
         // Check block.
