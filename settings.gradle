@@ -2,7 +2,6 @@ import org.gradle.util.GradleVersion
 
 include 'core'
 include 'tools'
-include 'examples'
 
 def minGradleVersion = GradleVersion.version("8.4")
 if (GradleVersion.current().compareTo(minGradleVersion) >= 0 && JavaVersion.current().isJava11Compatible()) {

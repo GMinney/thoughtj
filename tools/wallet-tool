@@ -24,4 +24,4 @@ if [ ! -e target/wallet-tool.jar ] || [[ "$ALWAYS_BUILD_WALLETTOOL" != "" ]]; th
   cd tools
 fi
 
-java -jar target/wallet-tool.jar "$@"
+java -jar target/wallet-tool.jar -XX:ThreadStackSize=1024k "$@"

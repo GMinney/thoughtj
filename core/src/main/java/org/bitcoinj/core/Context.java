@@ -204,7 +204,7 @@ public class Context {
      */
     public static void propagate(Context context) {
         slot.set(checkNotNull(context));
-        BLSJniLibrary.init(false);
+        BLSJniLibrary.init(true);
     }
 
     /**
