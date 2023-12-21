@@ -1,4 +1,0 @@
-[submodule "contrib/dashj-bls"]
-	path = contrib/dashj-bls
-	url = https://github.com/GMinney/dashj-bls.git
-    branch = ThoughtJ-0.0.1-pre
