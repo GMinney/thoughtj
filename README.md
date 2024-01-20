@@ -1,3 +1,9 @@
+<picture>
+   <source media="(prefers-color-scheme: dark)" srcset="/thought_coffee.png">
+   <source media="(prefers-color-scheme: light)" srcset="/thought_coffee.png">
+   <img alt="ThoughtJ" src="/thought_coffee.png">
+</picture>
+
 # dashj
 
 > A Java library for working with Dash
